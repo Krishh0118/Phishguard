@@ -1,0 +1,1 @@
+print("PhishGuard is alive 🚀")
