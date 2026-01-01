@@ -18,23 +18,31 @@ if option == "Message":
             st.warning("Please enter a message to analyze.")
             st.stop()
 
+        # Rule-based analysis
         rule_score, found_words = rule_check(msg)
+
+        # AI-based analysis
         ai_pred, confidence = ai_predict(msg)
+
+        # Final decision logic (HYBRID)
         total = rule_score + ai_pred
 
-        if total >= 2:
+        if total >= 2 or confidence >= 70:
             st.error("⚠ PHISHING DETECTED")
         else:
             st.success("✅ MESSAGE IS SAFE")
 
-        st.subheader("📊 Analysis")
-        st.write("AI Confidence:", f"{confidence:.2f}%")
-        st.write("Rule score:", rule_score)
+        # -------- Explanation Section --------
+        st.subheader("📊 Analysis Details")
+
+        st.write("**Decision Logic:**")
+        st.write(f"- Rule Score: {rule_score}")
+        st.write(f"- AI Confidence: {confidence:.2f}%")
 
         if found_words:
-            st.write("Suspicious words found:", ", ".join(found_words))
+            st.write("**Suspicious words found:**", ", ".join(found_words))
         else:
-            st.write("No suspicious keywords found")
+            st.write("**Suspicious words found:** None")
 
 # ---------------- URL CHECK ----------------
 else:
@@ -53,10 +61,10 @@ else:
             st.success("✅ URL IS SAFE")
 
         st.subheader("🔍 URL Analysis")
-        st.write("URL risk score:", url_score)
+        st.write("URL Risk Score:", url_score)
 
         if reasons:
-            st.write("Reasons:")
+            st.write("**Reasons:**")
             for reason in reasons:
                 st.write("-", reason)
         else:
