@@ -1,37 +1,26 @@
 def calculate_risk(rule_score: int, ai_confidence: float, intel_score: int):
-    total = rule_score + intel_score + int(ai_confidence * 0.5)
+    """
+    Combines rule-based score, AI confidence, and intelligence score
+    to calculate overall phishing risk.
+    """
 
-    if total >= 70:
-        level = "HIGH"
-        label = "🚨 HIGH RISK"
-    elif total >= 40:
-        level = "MEDIUM"
-        label = "⚠️ MEDIUM RISK"
+    total_score = rule_score + intel_score + int(ai_confidence / 4)
+
+    if total_score >= 70:
+        return {
+            "label": "HIGH RISK ⚠️",
+            "level": "High",
+            "score": total_score
+        }
+    elif total_score >= 40:
+        return {
+            "label": "MEDIUM RISK ⚠️",
+            "level": "Medium",
+            "score": total_score
+        }
     else:
-        level = "LOW"
-        label = "✅ LOW RISK"
-
-    return {
-        "score": total,
-        "level": level,
-        "label": label
-    }
-def calculate_risk(rule_score: int, ai_confidence: float, intel_score: int):
-    total = rule_score + intel_score + int(ai_confidence * 0.5)
-
-    if total >= 70:
-        level = "HIGH"
-        label = "🚨 HIGH RISK"
-    elif total >= 40:
-        level = "MEDIUM"
-        label = "⚠️ MEDIUM RISK"
-    else:
-        level = "LOW"
-        label = "✅ LOW RISK"
-
-    return {
-        "score": total,
-        "level": level,
-        "label": label
-    }
-    5b7c4ae (Add missing engine modules (risk, domain, link))
+        return {
+            "label": "LOW RISK ✅",
+            "level": "Low",
+            "score": total_score
+        }
