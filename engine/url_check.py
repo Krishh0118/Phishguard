@@ -1,28 +1,23 @@
 from urllib.parse import urlparse
 
-def url_check(url):
+SUSPICIOUS_TLDS = [".click", ".xyz", ".top", ".zip", ".ru"]
+
+def url_check(url: str):
+    parsed = urlparse(url)
     score = 0
     reasons = []
 
-    parsed = urlparse(url)
-
-    # Rule 1: HTTP instead of HTTPS
-    if parsed.scheme != "https":
-        score += 1
+    if not url.startswith("https"):
+        score += 25
         reasons.append("Uses HTTP instead of HTTPS")
 
-    # Rule 2: Suspicious words in domain
-    suspicious_words = ["login", "verify", "secure", "account"]
-    for word in suspicious_words:
-        if word in parsed.netloc.lower():
-            score += 1
-            reasons.append(f"Suspicious word in domain: {word}")
-
-    # Rule 3: Suspicious TLD
-    suspicious_tlds = [".ru", ".tk", ".ml", ".ga", ".cf"]
-    for tld in suspicious_tlds:
+    for tld in SUSPICIOUS_TLDS:
         if parsed.netloc.endswith(tld):
-            score += 1
-            reasons.append(f"Suspicious domain extension: {tld}")
+            score += 30
+            reasons.append(f"Suspicious TLD detected ({tld})")
 
-    return score, reasons
+    if any(brand in url.lower() for brand in ["paypal", "google", "bank"]):
+        score += 30
+        reasons.append("Possible brand impersonation")
+
+    return min(score, 100), reasons

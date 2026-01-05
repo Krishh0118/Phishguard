@@ -38,3 +38,16 @@ def domain_intel(url: str):
         reasons.append("IP address used as domain")
 
     return score, reasons
+def domain_intel(url: str):
+    score = 0
+    reasons = []
+
+    if url.endswith(".xyz"):
+        score += 20
+        reasons.append("Suspicious TLD (.xyz)")
+
+    return {
+        "score": score,
+        "reasons": reasons
+    }
+ 5b7c4ae (Add missing engine modules (risk, domain, link))
