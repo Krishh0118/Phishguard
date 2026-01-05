@@ -1,14 +1,12 @@
 import streamlit as st
 
 # ================= ENGINE IMPORTS =================
-from main.engine.rules import rule_check
-from main.engine.url_check import url_check
-from main.engine.ai_model import ai_predict
-from main.engine.risk_engine import calculate_risk
-from main.engine.domain_intel import domain_intel
-from main.engine.link_intel import check_link_intel
-
-
+from engine.rules import rule_check
+from engine.url_check import url_check
+from engine.ai_model import ai_predict
+from engine.risk_engine import calculate_risk
+from engine.domain_intel import domain_intel
+from engine.link_intel import check_link_intel
 
 # ================= PAGE CONFIG ====================
 st.set_page_config(
