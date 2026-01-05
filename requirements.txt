@@ -3,4 +3,7 @@ scikit-learn
 joblib
 numpy
 pandas
+python-whois
+fastapi
+uvicorn
 
