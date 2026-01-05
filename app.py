@@ -15,70 +15,27 @@ st.set_page_config(
     layout="centered"
 )
 
-# ================= CUSTOM CSS =====================
-st.markdown("""
-<style>
-body {
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-}
-.main {
-    background-color: transparent;
-}
-.card {
-    background: rgba(255,255,255,0.06);
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0px 0px 25px rgba(0,0,0,0.3);
-    margin-top: 20px;
-}
-.title {
-    text-align: center;
-    font-size: 42px;
-    font-weight: bold;
-    color: #ffffff;
-}
-.subtitle {
-    text-align: center;
-    color: #cfd8dc;
-    font-size: 16px;
-    margin-bottom: 30px;
-}
-.result-box {
-    background: rgba(0,0,0,0.5);
-    padding: 20px;
-    border-radius: 12px;
-    margin-top: 20px;
-}
-</style>
-""", unsafe_allow_html=True)
-
-# ================= HEADER =========================
-st.markdown("<div class='title'>🚨 PhishGuard</div>", unsafe_allow_html=True)
-st.markdown(
-    "<div class='subtitle'>AI-Powered Phishing & Scam Detection System</div>",
-    unsafe_allow_html=True
+st.title("🚨 PhishGuard – AI Cyber Safety Assistant")
+st.write(
+    "PhishGuard analyzes messages and URLs using **AI + security intelligence** "
+    "to detect phishing and online scams."
 )
 
 # ================= MODE SELECT ====================
-option = st.radio(
-    "🔍 What do you want to analyze?",
-    ["Message", "URL"],
-    horizontal=True
-)
+option = st.radio("What do you want to check?", ["Message", "URL"])
 
-st.markdown("<div class='card'>", unsafe_allow_html=True)
 
 # =================================================
 # ================= MESSAGE ANALYSIS ===============
 # =================================================
 if option == "Message":
 
-    msg = st.text_area("📩 Paste the suspicious message here")
+    msg = st.text_area("Paste the message here")
 
-    if st.button("🚀 Analyze Message"):
+    if st.button("Analyze Message"):
 
         if not msg.strip():
-            st.warning("⚠️ Please enter a message.")
+            st.warning("Please enter a message.")
             st.stop()
 
         rule_score, found_words = rule_check(msg)
@@ -90,21 +47,21 @@ if option == "Message":
             intel_score=0
         )
 
-        label = risk.get("label", "UNKNOWN")
+        # ---- SAFE EXTRACTION ----
+        label = risk.get("label", "UNKNOWN RISK")
         score = risk.get("score", 0)
         level = risk.get("level", label)
 
-        st.markdown("<div class='result-box'>", unsafe_allow_html=True)
-        st.error(f"⚠️ {label}")
+        st.warning(f"⚠️ {label}")
+        st.subheader("📊 Analysis")
+
         st.write(f"**Risk Level:** {level}")
         st.write(f"**Risk Score:** {score}")
         st.write(f"**AI Confidence:** {confidence:.2f}%")
 
         if found_words:
-            st.write("🔎 **Suspicious Keywords Detected:**")
+            st.subheader("🔎 Suspicious Keywords Found")
             st.write(", ".join(found_words))
-
-        st.markdown("</div>", unsafe_allow_html=True)
 
 
 # =================================================
@@ -112,50 +69,66 @@ if option == "Message":
 # =================================================
 else:
 
-    url = st.text_input("🌐 Paste the URL here")
+    url = st.text_input("Paste the URL here")
 
-    if st.button("🚀 Analyze URL"):
+    if st.button("Analyze URL"):
 
         if not url.strip():
-            st.warning("⚠️ Please enter a URL.")
+            st.warning("Please enter a URL.")
             st.stop()
 
+        # ---------- URL RULES ----------
         base_score, url_reasons = url_check(url)
-        domain_score, domain_reasons = domain_intel(url)
-        link_score, link_reasons = check_link_intel(url)
+        base_score = int(base_score)
 
-        intel_score = int(domain_score) + int(link_score)
+        # ---------- DOMAIN INTEL ----------
+        domain_score = 0
+        domain_reasons = []
+        domain_result = domain_intel(url)
+
+        if isinstance(domain_result, tuple):
+            domain_score = int(domain_result[0])
+            domain_reasons = domain_result[1] or []
+
+        # ---------- LINK INTEL ----------
+        link_score = 0
+        link_reasons = []
+        link_result = check_link_intel(url)
+
+        if isinstance(link_result, tuple):
+            link_score = int(link_result[0])
+            link_reasons = link_result[1] or []
+
+        intel_score = domain_score + link_score
 
         risk = calculate_risk(
-            rule_score=int(base_score),
+            rule_score=base_score,
             ai_confidence=0.0,
             intel_score=intel_score
         )
 
-        label = risk.get("label", "UNKNOWN")
+        # ---- SAFE EXTRACTION ----
+        label = risk.get("label", "UNKNOWN RISK")
         score = risk.get("score", 0)
         level = risk.get("level", label)
 
-        st.markdown("<div class='result-box'>", unsafe_allow_html=True)
-        st.error(f"⚠️ {label}")
+        st.warning(f"⚠️ {label}")
+        st.subheader("🔐 Risk Assessment")
+
         st.write(f"**Risk Level:** {level}")
         st.write(f"**Total Risk Score:** {score}")
 
         if url_reasons:
-            st.write("🔍 **URL Pattern Findings:**")
+            st.subheader("🔍 URL Pattern Findings")
             for r in url_reasons:
                 st.write(f"- {r}")
 
         if domain_reasons:
-            st.write("🌐 **Domain Intelligence:**")
+            st.subheader("🌐 Domain Intelligence")
             for r in domain_reasons:
                 st.write(f"- {r}")
 
         if link_reasons:
-            st.write("🔗 **Link Intelligence:**")
+            st.subheader("🔗 Link Intelligence")
             for r in link_reasons:
-                st.write(f"- {r}")
-
-        st.markdown("</div>", unsafe_allow_html=True)
-
-st.markdown("</div>", unsafe_allow_html=True)
+                st.write(f"- {r}") 
